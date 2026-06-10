@@ -19,15 +19,45 @@ export default function Layout() {
           ),
         }}
       />
-      {/* Updated from profile to settings */}
+      
       <Tabs.Screen
         name="settings" 
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
-            /* Using options-outline or information-circle-outline for an info/settings look */
             <Ionicons name={focused ? "options" : "options-outline"} size={24} color={color} />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="add"
+        options={{
+          href: null,
+        }}
+      />
+
+
+      <Tabs.Screen
+        name="times"
+        options={{
+          href: null,
+        }}
+      />
+
+
+        <Tabs.Screen
+        name="themes"
+        options={{
+          href: null,
+        }}
+      />
+
+
+      <Tabs.Screen
+        name="ocrTrain"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

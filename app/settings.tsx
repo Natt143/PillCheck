@@ -1,3 +1,4 @@
+import { Link } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -11,24 +12,25 @@ export default function DetailsScreen() {
       <View style={styles.menuContainer}>
 
         {/* Option 1 */}
-        <TouchableOpacity style={styles.buttonBox}>
-          <Text style={styles.optionText}>Add/Remove Medication</Text>
-        </TouchableOpacity>
+        <Link href='/add' asChild>
+          <TouchableOpacity style={styles.buttonBox}>
+            <Text style={styles.optionText}>Add/Remove Medication</Text>
+          </TouchableOpacity>
+        </Link>
 
         {/* Option 2 */}
-        <TouchableOpacity style={styles.buttonBox}>
-          <Text style={styles.optionText}>Change pill times</Text>
-        </TouchableOpacity>
-
-        {/* Option 3 */}
-        <TouchableOpacity style={styles.buttonBox}>
-          <Text style={styles.optionText}>Re-train OCR</Text>
-        </TouchableOpacity>
+       <Link href='/times' asChild>
+          <TouchableOpacity style={styles.buttonBox}>
+            <Text style={styles.optionText}>Change pill times</Text>
+          </TouchableOpacity>
+        </Link>
 
         {/* Option 4 */}
-        <TouchableOpacity style={styles.buttonBox}>
-          <Text style={styles.optionText}>Themes</Text>
-        </TouchableOpacity>
+       <Link href='/themes' asChild>
+          <TouchableOpacity style={styles.buttonBox}>
+            <Text style={styles.optionText}>Themes</Text>
+          </TouchableOpacity>
+        </Link>
 
         {/* Option 5 */}
         <TouchableOpacity style={styles.buttonBox}>

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { OCRScanner } from "../components/scanner";
 
 export default function Index() {
   const insets = useSafeAreaInsets();
@@ -68,17 +69,53 @@ export default function Index() {
     setStatusText("Analyzing pill bottle...");
   };
 
-  const showSuccess = () => {
-    setLogs((currentLogs) => {
-      const nextLogsCount = currentLogs + 1;
-      if (nextLogsCount === 1) {
-        setTime1Stat("logged");
-      } else if (nextLogsCount === 2) {
-        setTime2Stat("logged");
+  // Modified to handle the clean 'Match' / 'No Match' statuses from the scanner
+const handleAiDetection = (status: string) => {
+    if (status === 'No Match') {
+      setStatusText("AI Detected: No Match. Try again!");
+      return; 
+    }
+
+    if (status === 'Match') {
+      if (time1Stat === "log" && isTimeWindowOpen(time1)) {
+        setStatusText(`AI Detected: Morning Pill Verified!`);
+        showSuccess("morning"); // <-- Tell it to log the morning slot
+        return;
+      } 
+      
+      if (time2Stat === "log" && isTimeWindowOpen(time2)) {
+        setStatusText(`AI Detected: Evening Pill Verified!`);
+        showSuccess("evening"); // <-- Tell it to log the evening slot
+        return;
       }
-      return nextLogsCount;
-    });
+
+      // If a window isn't open
+      setStatusText("Too early or too late! No pill window is open right now.");
+    }
   };
+
+const showSuccess = (timeSlot?: string) => {
+  setLogs((currentLogs) => {
+    const nextLogsCount = currentLogs + 1;
+
+    // If a specific slot was passed from the AI, log that exact one
+    if (timeSlot === "morning") {
+      setTime1Stat("logged");
+      return nextLogsCount;
+    } else if (timeSlot === "evening") {
+      setTime2Stat("logged");
+      return nextLogsCount;
+    }
+
+    if (time1Stat === "log") {
+      setTime1Stat("logged");
+    } else {
+      setTime2Stat("logged");
+    }
+
+    return nextLogsCount;
+  });
+};
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
@@ -86,7 +123,10 @@ export default function Index() {
       <Text style={styles.statusText}>{statusText}</Text>
 
       <View style={styles.cameraBox}>
-        <Text style={styles.boxPlaceholderText}>Camera View Placeholder</Text>
+        <OCRScanner 
+          onStatusChange={handleAiDetection} 
+          showSuccess={showSuccess} 
+        />
       </View>
 
       <View style={styles.buttonContainer}>
@@ -94,7 +134,7 @@ export default function Index() {
           <Text style={styles.buttonText}>Simulate Scan</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, { backgroundColor: '#4CD964' }]} onPress={showSuccess}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: '#4CD964' }]} onPress={() => showSuccess()}>
           <Text style={styles.buttonText}>Simulate Success</Text>
         </TouchableOpacity>
       </View>
@@ -128,65 +168,28 @@ function timeToMinutes(timeStr: string): number {
   return hours * 60 + minutes;
 }
 
+function isTimeWindowOpen(targetTimeStr: string): boolean {
+  const now = new Date();
+  const currentTotalMinutes = now.getHours() * 60 + now.getMinutes();
+  const targetTotalMinutes = timeToMinutes(targetTimeStr);
+
+  const START_ALLOWANCE = 60; 
+  const END_ALLOWANCE = 180;  
+
+  return (
+    currentTotalMinutes >= targetTotalMinutes - START_ALLOWANCE &&
+    currentTotalMinutes <= targetTotalMinutes + END_ALLOWANCE
+  );
+}
+
 const styles = StyleSheet.create({
-container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerText: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 10,
-  },
-  statusText: {
-    fontSize: 18,
-    color: "#555",
-    marginBottom: 30,
-    fontWeight: "500",
-  },
-  cameraBox: {
-    width: 320,
-    height: 320,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  boxPlaceholderText: {
-    color: "#666",
-    fontSize: 16,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 10,
-  },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  logAt: {
-    paddingVertical: 12,
-    width: "70%",
-    maxWidth: 400,
-    borderRadius: 10,
-    justifyContent: "center",   
-    alignItems: "center",
-  },
-  logAtText: {
-    color: "#4a4a4a",
-    fontWeight: "bold",
-    fontSize: 18,
-    textTransform: "capitalize",
-  }
+  container: { flex: 1, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" },
+  headerText: { fontSize: 28, fontWeight: "bold", color: "#333", marginBottom: 10 },
+  statusText: { fontSize: 18, color: "#555", marginBottom: 30, fontWeight: "500" },
+  cameraBox: { width: 320, height: 320, backgroundColor: "#e0e0e0", borderRadius: 20, justifyContent: "center", alignItems: "center", marginBottom: 30, overflow: "hidden" },
+  buttonContainer: { flexDirection: "row", gap: 10, marginBottom: 10 },
+  button: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10 },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 14 },
+  logAt: { paddingVertical: 12, width: "70%", maxWidth: 400, borderRadius: 10, justifyContent: "center", alignItems: "center" },
+  logAtText: { color: "#4a4a4a", fontWeight: "bold", fontSize: 18, textTransform: "capitalize" }
 });
