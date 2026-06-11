@@ -4,11 +4,14 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as FileSystem from 'expo-file-system/legacy';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useStore } from '../store/states'; // Adjust path if needed to match your store location
+
 
 // Pointing directly to your newly added Teachable Machine files
 const localModelJson = require('../assets/ocr_model/model.json');
 const weights = require('../assets/ocr_model/weights.bin'); 
+
+// Define the valid statuses for your pill state tracking
+type PillState = 'Awaiting scan...' | 'AI Scanner Ready' | 'Scanning shape...' | 'Match' | 'No Match';
 
 export function OCRScanner({ 
   onStatusChange, 
@@ -17,8 +20,9 @@ export function OCRScanner({
   onStatusChange: (status: string) => void;
   showSuccess: () => void;
 }) {
-  // HOOK FIX: Store hook must be declared at the top level of the component body
-  const setPillStatus = useStore((state) => state.setPillStatus);
+
+  // FIXED: Destructured as an array [pillState, setPillStatus] instead of wrapping type in useState incorrectly
+  const [pillState, setPillStatus] = useState<PillState>('Awaiting scan...');
 
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<any>(null);
@@ -42,6 +46,7 @@ export function OCRScanner({
         setModel(loadedModel);
         setIsTfReady(true);
         setOcrResult('AI Scanner Ready');
+        setPillStatus('AI Scanner Ready');
       } catch (error) {
         console.error("Failed to initialize custom AI model:", error);
         setOcrResult('Failed to load local AI.');
@@ -119,6 +124,7 @@ export function OCRScanner({
 
     setIsProcessing(true);
     setOcrResult('Scanning shape...');
+    setPillStatus('Scanning shape...');
 
     try {
       const currentFeatures = await getRawFeatures();

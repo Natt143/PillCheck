@@ -1,13 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { ThemeProvider, useTheme } from "../context/themeContext";
 
-export default function Layout() {
+function TabLayout() {
+  const { isDark } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#8E8E93',
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: isDark ? '#1c1c1e' : '#ffffff',
+          borderTopColor: isDark ? '#333' : '#e0e0e0',
+        },
       }}
     >
       <Tabs.Screen
@@ -19,9 +26,8 @@ export default function Layout() {
           ),
         }}
       />
-      
       <Tabs.Screen
-        name="settings" 
+        name="settings"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
@@ -29,37 +35,16 @@ export default function Layout() {
           ),
         }}
       />
-
-      <Tabs.Screen
-        name="add"
-        options={{
-          href: null,
-        }}
-      />
-
-
-      <Tabs.Screen
-        name="times"
-        options={{
-          href: null,
-        }}
-      />
-
-
-        <Tabs.Screen
-        name="themes"
-        options={{
-          href: null,
-        }}
-      />
-
-
-      <Tabs.Screen
-        name="ocrTrain"
-        options={{
-          href: null,
-        }}
-      />
+      <Tabs.Screen name="times" options={{ href: null }} />
+      <Tabs.Screen name="themes" options={{ href: null }} />
     </Tabs>
+  );
+}
+
+export default function Layout() {
+  return (
+    <ThemeProvider>
+      <TabLayout />
+    </ThemeProvider>
   );
 }
