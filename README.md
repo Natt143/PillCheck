@@ -1,4 +1,8 @@
-# Welcome to your Expo app 👋
+# This is pill check!
+
+Pill check is an app that helps you keep track of your medication!
+It does this my forcing you to _log_ your medication by taking a photo of it.
+
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
