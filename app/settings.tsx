@@ -31,6 +31,11 @@ export default function SettingsScreen() {
             <Text style={theme.optionText}>Change pill times</Text>
           </TouchableOpacity>
         </Link>
+        <Link href='/pharmacy' asChild>
+          <TouchableOpacity style={theme.buttonBox}>
+            <Text style={theme.optionText}>Nearest Pharmacy</Text>
+          </TouchableOpacity>
+        </Link>
         <TouchableOpacity style={theme.buttonBox} onPress={handleReset}>
           <Text style={theme.optionText}>Reset App</Text>
         </TouchableOpacity>

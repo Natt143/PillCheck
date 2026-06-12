@@ -37,6 +37,7 @@ function TabLayout() {
       />
       <Tabs.Screen name="times" options={{ href: null }} />
       <Tabs.Screen name="themes" options={{ href: null }} />
+      <Tabs.Screen name="pharmacy" options={{ href: null }} />
     </Tabs>
   );
 }
